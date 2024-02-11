@@ -1,5 +1,4 @@
 
-from numpy import e
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -8,19 +7,31 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.webdriver.common.keys import Keys
+from urllib.parse import urlsplit
+from openpyxl import load_workbook
 
 import pandas as pd 
 import time
+
 
 options = Options()
 #options.add_experimental_option("detach", True)
 options.add_argument("--enable-javascript")
 
 
-def saveToexcel():
-    pass
 
-
+def saveToexcel(i, price, profit, link):                                         
+    fileName = urlsplit(link).hostname.split('.')[0]                             
+    fileName = fileName + ".xlsx"                                                
+                                                                                 
+    priceCol = "price" + str(i)  # Convert i to string
+    profitCol = "profit" + str(i)  # Convert i to string
+                                                                                 
+    data = {'Dataname': [priceCol, profitCol], 'Data': [price, profit]}        
+    df = pd.DataFrame(data)                                                      
+                                                                                 
+    with pd.ExcelWriter(fileName, engine='xlsxwriter') as writer:              
+        df.to_excel(writer, sheet_name='Sheet1', index=False, header=False)
 
 
 
@@ -48,9 +59,27 @@ def scrapeLink(link):
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "_blogInnerContent")))
 
         boxes = driver.find_elements(By.XPATH, "//li[@class='block media _feedPick feed-pick']")
-        print(len(boxes))
 
-        time.sleep(100)
+
+        for i, box in enumerate(boxes, start = 1):
+
+            driver.execute_script("arguments[0].scrollIntoView();", box)
+
+            price = box.find_element(By.XPATH, ".//div[@class='pick-line']//span").text
+            print(price)
+            
+            
+            divProfit = box.find_element(By.XPATH, ".//div[@class='labels']")
+            text = divProfit.text.split()   
+            profit = text[3]
+            print(profit)
+
+            saveToexcel(i, price, profit, link)
+
+            
+            
+
+
 
 
 
@@ -70,7 +99,7 @@ def scrapeLink(link):
 
 
 def iterateThroughExcel():
-    df = pd.read_excel("blogabet links.xlsx", header = None)
+    df = pd.read_excel("Updated_blogabet links.xlsx", header = None)
     links = df[0].tolist()
 
     for link in links:
@@ -79,8 +108,8 @@ def iterateThroughExcel():
     
 
 
-#iterateThroughExcel()
-scrapeLink("https://m2picks.blogabet.com/")
+iterateThroughExcel()
+#scrapeLink("https://m2picks.blogabet.com/")
 
 
 
