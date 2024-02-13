@@ -12,6 +12,7 @@ from openpyxl import load_workbook
 
 import pandas as pd 
 import time
+import os
 
 
 options = Options()
@@ -19,19 +20,31 @@ options = Options()
 options.add_argument("--enable-javascript")
 
 
+                                                                            
+def saveToexcel(i, price, profit, link):                                    
+    fileName = urlsplit(link).hostname.split('.')[0]                        
+    fileName = fileName + ".xlsx"                                           
+                                                                            
+    priceCol = "price" + str(i)  # Convert i to string                      
+    profitCol = "profit" + str(i)  # Convert i to string                    
+                                                                            
+    data = {'Dataname': [priceCol, profitCol], 'Data': [price, profit]}     
+    df = pd.DataFrame(data)                                                 
+    
 
-def saveToexcel(i, price, profit, link):                                         
-    fileName = urlsplit(link).hostname.split('.')[0]                             
-    fileName = fileName + ".xlsx"                                                
-                                                                                 
-    priceCol = "price" + str(i)  # Convert i to string
-    profitCol = "profit" + str(i)  # Convert i to string
-                                                                                 
-    data = {'Dataname': [priceCol, profitCol], 'Data': [price, profit]}        
-    df = pd.DataFrame(data)                                                      
-                                                                                 
-    with pd.ExcelWriter(fileName, engine='xlsxwriter') as writer:              
-        df.to_excel(writer, sheet_name='Sheet1', index=False, header=False)
+    if not os.path.exists(fileName):
+        with pd.ExcelWriter(fileName, engine = 'openpyxl') as writer:
+            df.to_excel(writer, index=False, header=False)
+
+            
+    with pd.ExcelWriter(fileName,engine='openpyxl', mode = 'a', if_sheet_exists='overlay') as writer:           
+        df.to_excel(writer, sheet_name='Sheet1',startrow=writer.sheets['Sheet1'].max_row, index=False, header = False) 
+                                                                            
+                                                                            
+                          
+                          
+
+
 
 
 
