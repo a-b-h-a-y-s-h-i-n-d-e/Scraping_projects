@@ -7,7 +7,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.webdriver.common.keys import Keys
-
+from selenium.common.exceptions import NoSuchElementException
 import time
 import threading
 
@@ -27,6 +27,8 @@ def cancelAdd(driver):
         print(e)
 
 
+def createCSV():
+    pass
 
 def scrapeHome(startDate, endDate):
     driver = webdriver.Chrome(service=Service("./chromedriver"), options= options)
@@ -44,22 +46,48 @@ def scrapeHome(startDate, endDate):
     # Entering startDate and endDate 
     try:
         leagueChart = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, "//div[@id='league-chemp']"))) 
-        print("chart found")
         driver.execute_script("arguments[0].scrollIntoView(true);", leagueChart)
 
         # clicking on home button
         homeButtonID = driver.find_element(By.XPATH, "//input[@id='home-away2']")
-        labelElement = homeButtonID.find_element(By.XPATH, "following-sibling::label")
+        labelElement = homeButtonID.find_element(By.XPATH, "following-sibling::label") 
+        driver.execute_script("arguments[0].scrollIntoView(true);", labelElement)
         #labelElement.click()
         driver.execute_script("arguments[0].click();", labelElement)
-        print("clicked on home button")
         
+        #startDateInput = leagueChart.find_element(By.XPATH, ".//input[@id='dp1709963814828']")
+        #print(startDateInput)
+        #print("Element found")
+        #startDateInput.click()
+        #startDateInput.send_keys(startDate)
 
-        startDateInput = leagueChart.find_element(By.XPATH, ".//input[@id='dp1709890810991']")
-        print("Element found")
-        driver.execute_script("arguments[0].scrollIntoView(true);", startDateInput)
-        startDateInput.click()
-        startDateInput.send_keys(startDate)
+        headers = ['No.', 'Team', 'M', 'W', 'D', 'L', 'G', 'GA', 'PTS', 'xG', 'xGA', 'xPTS']
+        data = []
+        
+        rows = leagueChart.find_elements(By.XPATH, ".//table//tbody//tr")
+        for row in rows:
+            number = row.find_element(By.XPATH, ".//td[@class='align-right']").text 
+            team = row.find_element(By.XPATH, ".//td//a").text
+            matches = row.find_element(By.XPATH, ".//td[@class='align-right'][2]").text 
+            wins = row.find_element(By.XPATH, ".//td[@class='align-right'][3]").text 
+            draw = row.find_element(By.XPATH, ".//td[@class='align-right'][4]").text  
+            loose = row.find_element(By.XPATH, ".//td[@class='align-right'][5]").text 
+            games = row.find_element(By.XPATH, ".//td[@class='align-right'][6]").text
+            ga = row.find_element(By.XPATH, ".//td[@class='align-right'][7]").text 
+            pts = row.find_element(By.XPATH, ".//td[@class='align-right'][8]").text 
+            #try:
+            #    xg = row.find_elements(By.TAG_NAME, "td")[9].text
+            #except Exception as e:
+            #    print(e)
+            
+            xg = row.find_elements(By.TAG_NAME, "td")[9].text
+            xpts = row.find_element(By.XPATH, ".//td[@class='align-right nowrap'][2]").text
+            print(number, team, matches, wins, draw, loose, games, ga, pts, xg, xpts)
+
+
+
+    except NoSuchElementException:
+        print('Element not found!!')
     except Exception as e:
         print(e)
 
@@ -72,13 +100,7 @@ def run():
     #print("Enter data of Start date -:")
     #while True:
     #    startMonth = input("Enter month -> (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec) -> ")
-    #    if(len(startMonth) == 3):
-    #        break
-    #    else:
-    #        print("Please Enter valid Month :)")
-    #
-    #while True:
-    #    startDay = input("Enter date -> (from 1 to 31) -> ")
+    #    if(len(startMonth) == 31) -> ")
     #    if(len(startDay) > 0 and len(startDay) < 3):
     #        break
     #    else:
