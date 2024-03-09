@@ -8,8 +8,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+
 import time
 import threading
+import csv
 
 def cancelAdd(driver):
     print("Threading start to check incoming adds")
@@ -27,8 +29,18 @@ def cancelAdd(driver):
         print(e)
 
 
-def createCSV():
-    pass
+def createCSV(fileName, headers, data):
+    try:
+        with open(fileName, mode = 'w', newline = '') as file:
+            writer = csv.writer(file)
+
+            # writing headers first
+            writer.writerow(headers)
+
+            # now writing remaining data 
+            writer.writerows(data)
+    except Exception as e:
+        raise
 
 def scrapeHome(startDate, endDate):
     driver = webdriver.Chrome(service=Service("./chromedriver"), options= options)
@@ -63,7 +75,6 @@ def scrapeHome(startDate, endDate):
 
         headers = ['No.', 'Team', 'M', 'W', 'D', 'L', 'G', 'GA', 'PTS', 'xG', 'xGA', 'xPTS']
         data = []
-        
         rows = leagueChart.find_elements(By.XPATH, ".//table//tbody//tr")
         for row in rows:
             number = row.find_element(By.XPATH, ".//td[@class='align-right']").text 
@@ -81,8 +92,11 @@ def scrapeHome(startDate, endDate):
             #    print(e)
             
             xg = row.find_elements(By.TAG_NAME, "td")[9].text
+            xga = row.find_elements(By.TAG_NAME, "td")[10].text
             xpts = row.find_element(By.XPATH, ".//td[@class='align-right nowrap'][2]").text
-            print(number, team, matches, wins, draw, loose, games, ga, pts, xg, xpts)
+            tempList = [number, team, matches, wins, draw, loose, games, ga, pts, xg, xga, xpts]
+            data.append(tempList)
+        print(data)
 
 
 
@@ -90,6 +104,9 @@ def scrapeHome(startDate, endDate):
         print('Element not found!!')
     except Exception as e:
         print(e)
+
+    fileName = 'homeData.csv'
+    createCSV(fileName, headers, data)
 
 
 def scrapeAway():
