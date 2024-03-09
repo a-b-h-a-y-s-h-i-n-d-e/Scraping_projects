@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
+from webdriver_manager.chrome import ChromeDriverManager
 
 import time
 import threading
@@ -26,8 +27,8 @@ def cancelAdd(driver):
         driver.execute_script("arguments[0].click();", cancelButton)
         driver.switch_to.default_content()
     except Exception as e:
-        print(e)
-
+        # don't know but add is not coming when running through script 
+        pass
 
 def createCSV(fileName, headers, data):
     try:
@@ -43,7 +44,7 @@ def createCSV(fileName, headers, data):
         raise
 
 def scrapeHome(startDate, endDate):
-    driver = webdriver.Chrome(service=Service("./chromedriver"), options= options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options= options)
     driver.set_window_size(1500, 1000)
     actions = ActionChains(driver)
     try:                                                   
@@ -67,11 +68,18 @@ def scrapeHome(startDate, endDate):
         #labelElement.click()
         driver.execute_script("arguments[0].click();", labelElement)
         
-        #startDateInput = leagueChart.find_element(By.XPATH, ".//input[@id='dp1709963814828']")
-        #print(startDateInput)
-        #print("Element found")
-        #startDateInput.click()
-        #startDateInput.send_keys(startDate)
+        startDateInput = driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div[3]/div/div[1]/input[1]')
+        driver.execute_script("arguments[0].scrollIntoView(true);", startDateInput)
+        driver.execute_script("arguments[0].click();", startDateInput)
+        startDateInput.send_keys(startDate)
+        startDateInput.send_keys(Keys.ENTER)
+
+
+        endDateInput = driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div[3]/div/div[1]/input[2]') 
+        driver.execute_script("arguments[0].scrollIntoView(true);",endDateInput) 
+        driver.execute_script("arguments[0].click();", endDateInput)
+        endDateInput.send_keys(endDate)
+        endDateInput.send_keys(Keys.ENTER)
 
         headers = ['No.', 'Team', 'M', 'W', 'D', 'L', 'G', 'GA', 'PTS', 'xG', 'xGA', 'xPTS']
         data = []
@@ -86,11 +94,6 @@ def scrapeHome(startDate, endDate):
             games = row.find_element(By.XPATH, ".//td[@class='align-right'][6]").text
             ga = row.find_element(By.XPATH, ".//td[@class='align-right'][7]").text 
             pts = row.find_element(By.XPATH, ".//td[@class='align-right'][8]").text 
-            #try:
-            #    xg = row.find_elements(By.TAG_NAME, "td")[9].text
-            #except Exception as e:
-            #    print(e)
-            
             xg = row.find_elements(By.TAG_NAME, "td")[9].text
             xga = row.find_elements(By.TAG_NAME, "td")[10].text
             xpts = row.find_element(By.XPATH, ".//td[@class='align-right nowrap'][2]").text
@@ -101,6 +104,7 @@ def scrapeHome(startDate, endDate):
 
 
     except NoSuchElementException:
+        raise
         print('Element not found!!')
     except Exception as e:
         print(e)
@@ -110,7 +114,7 @@ def scrapeHome(startDate, endDate):
     driver.quit()
 
 def scrapeAway(startDate, endDate):
-     driver = webdriver.Chrome(service=Service("./chromedriver"), options= options)                                         
+     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options= options)                                         
      driver.set_window_size(1500, 1000)                                                                                     
      actions = ActionChains(driver)                                                                                     
      try:                                                                                                                   
@@ -134,12 +138,20 @@ def scrapeAway(startDate, endDate):
          #labelElement.click()                                                                                              
          driver.execute_script("arguments[0].click();", labelElement)                                                       
                                                                                                                             
-         #startDateInput = leagueChart.find_element(By.XPATH, ".//input[@id='dp1709963814828']")                            
-         #print(startDateInput)                                                                                             
-         #print("Element found")                                                                                            
-         #startDateInput.click()                                                                                            
-         #startDateInput.send_keys(startDate)                                                                               
-                                                                                                                            
+         
+         startDateInput = driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div[3]/div/div[1]/input[1]')   
+         driver.execute_script("arguments[0].scrollIntoView(true);", startDateInput)                          
+         driver.execute_script("arguments[0].click();", startDateInput)                                       
+         startDateInput.send_keys(startDate)                                                                  
+         startDateInput.send_keys(Keys.ENTER)                                                                 
+                                                                                                               
+                                                                                                               
+         endDateInput = driver.find_element(By.XPATH, '/html/body/div[1]/div[3]/div[3]/div/div[1]/input[2]')  
+         driver.execute_script("arguments[0].scrollIntoView(true);",endDateInput)                             
+         driver.execute_script("arguments[0].click();", endDateInput)                                         
+         endDateInput.send_keys(endDate)                                                                      
+         endDateInput.send_keys(Keys.ENTER)                                                                   
+
          headers = ['No.', 'Team', 'M', 'W', 'D', 'L', 'G', 'GA', 'PTS', 'xG', 'xGA', 'xPTS']                               
          data = []                                                                                                          
          rows = leagueChart.find_elements(By.XPATH, ".//table//tbody//tr")                                                  
@@ -226,8 +238,8 @@ def run():
             print("Please Enter valid Year :)")                                                                                                
     endDate = endMonth + " " + endDay + ", " + endYear                                                     
     print(endDate)
-    startDate = "Sep 1, 2023"
-    endDate = "Mar 1, 2024"
+    #startDate = "Sep 1, 2023"
+    #endDate = "Mar 1, 2024"
 
     scrapeHome(startDate, endDate)
     scrapeAway(startDate, endDate)
