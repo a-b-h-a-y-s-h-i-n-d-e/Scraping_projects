@@ -178,53 +178,58 @@ def scrapeAway(startDate, endDate):
 
 def run():
                                                   
-    #print("Enter data of Start date -:")
-    #while True:
-    #    startMonth = input("Enter month -> (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec) -> ")
-    #    if(len(startMonth) == 31) -> ")
-    #    if(len(startDay) > 0 and len(startDay) < 3):
-    #        break
-    #    else:
-    #        print("Please Enter valid Date :)")
+    print("Enter data of Start date -:")
+    while True:
+        startMonth = input("Enter month -> (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec) -> ")
+        if(len(startMonth) == 3):
+            break
+        else:
+            print("Please Enter valid Month :)")
+    while True:
+        startDay = input("Enter day -> (from 1 to 31) -> ")
+        if(len(startDay) > 0 and len(startDay) < 3):
+            break
+        else:
+            print("Please Enter valid Date :)")
 
-    #while True:
-    #    startYear = input("Enter year -> (e.g = 2024) -> ")
-    #    if(len(startYear) == 4):
-    #        break
-    #    else:
-    #        print("Please Enter valid Year :)")
-    #
-    #startDate = startMonth + " " +startDay + ", " + startYear
-    #print(startDate)
+    while True:
+        startYear = input("Enter year -> (e.g = 2024) -> ")
+        if(len(startYear) == 4):
+            break
+        else:
+            print("Please Enter valid Year :)")
+    
+    startDate = startMonth + " " +startDay + ", " + startYear
+    print(startDate)
     
 
-    #print("Enter data of End date -:")                                                                     
-    #while True:                                                                                              
-    #    endMonth = input("Enter month -> (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec) -> ")
-    #    if(len(endMonth) == 3):                                                                            
-    #        break                                                                                            
-    #    else:                                                                                                
-    #        print("Please Enter valid Month :)")                                                             
-    #                                                                                                         
-    #while True:                                                                                              
-    #    endDay = input("Enter date -> (from 1 to 31) -> ")                                                     
-    #    if(len(endDay) > 0 and len(endDay) < 3):                                                         
-    #        break                                                                                            
-    #    else:                                                                                                
-    #        print("Please Enter valid Date :)")                                                              
-    #                                                                                                         
-    #while True:                                                                                              
-    #    endYear = input("Enter year -> (e.g = 2024) -> ")                                                      
-    #    if(len(endYear) == 4):                                                                             
-    #        break                                                                                            
-    #    else:                                                                                                
-    #        print("Please Enter valid Year :)")                                                                                                
-    #endDate = endMonth + " " + endDay + ", " + endYear                                                     
-    #print(endDate)
+    print("Enter data of End date -:")                                                                     
+    while True:                                                                                              
+        endMonth = input("Enter month -> (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec) -> ")
+        if(len(endMonth) == 3):                                                                            
+            break                                                                                            
+        else:                                                                                                
+            print("Please Enter valid Month :)")                                                             
+                                                                                                             
+    while True:                                                                                              
+        endDay = input("Enter day -> (from 1 to 31) -> ")                                                     
+        if(len(endDay) > 0 and len(endDay) < 3):                                                         
+            break                                                                                            
+        else:                                                                                                
+            print("Please Enter valid Date :)")                                                              
+                                                                                                             
+    while True:                                                                                              
+        endYear = input("Enter year -> (e.g = 2024) -> ")                                                      
+        if(len(endYear) == 4):                                                                             
+            break                                                                                            
+        else:                                                                                                
+            print("Please Enter valid Year :)")                                                                                                
+    endDate = endMonth + " " + endDay + ", " + endYear                                                     
+    print(endDate)
     startDate = "Sep 1, 2023"
     endDate = "Mar 1, 2024"
 
-    #scrapeHome(startDate, endDate)
+    scrapeHome(startDate, endDate)
     scrapeAway(startDate, endDate)
 
 if __name__ == "__main__":
